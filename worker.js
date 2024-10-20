@@ -85,23 +85,13 @@ async function handleRequest(request, event) {
 		// Return list of available shortlinks if user supplies admin credentials.
 		const psk = request.headers.get('x-preshared-key');
 		if (psk === SECRET_KEY) {
-			// const { keys } = await LINKS.list();
-			let paths = "";
-            if (LINKS && typeof LINKS === 'object') {
-                Object.entries(LINKS).forEach(([key, value]) => {
-                    paths += `${key} ${value} \n`;
-                });
-
-                // Check if paths is still empty
-                if (paths === "") {
-                    paths = "No links available.";
-                }
-            } else {
-                paths = "LINKS is not an object.";
-            }
-
-			
-			return new Response(paths, { status: 200 });
+			const { keys } = await LINKS.list();
+			keys.forEach(async (element) => {
+				let paths = "";
+				const value = await LINKS.get(element.name)
+				paths += `${element.name} ${value}\n`
+				return new Response(paths, { status: 200 });
+			});
 		}
 
 		return new Response(html, {
