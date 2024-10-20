@@ -75,6 +75,7 @@ async function handlePOST(request) {
 				status: 409,
 			});
 		} else {
+			await LINKS.put(path, redirectURL);
 			return new Response(`${redirectURL} available at ${shortener}${path}`, {
 				status: 201,
 			});
