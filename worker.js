@@ -92,13 +92,13 @@ async function handleRequest(request, event) {
 				paths += `${element.name} ${value}\n`
 				return new Response(paths, { status: 200 });
 			});
+		} else {
+			return new Response(html, {
+				headers: {
+					'content-type': 'text/html;charset=UTF-8',
+				},
+			});
 		}
-
-		return new Response(html, {
-			headers: {
-				'content-type': 'text/html;charset=UTF-8',
-			},
-		});
 	}
 
 	const redirectURL = await LINKS.get(path);
