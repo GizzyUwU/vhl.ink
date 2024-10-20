@@ -87,12 +87,12 @@ async function handleRequest(request, event) {
 			const { keys } = await LINKS.list();
             const dataPromises = keys.map(async (element) => {
                 const value = await LINKS.get(element.name);
-                return `${element.name} ${value}\n`;
+                return `${element.name} ${value}`;
             });
 
             const dataArray = await Promise.all(dataPromises);
             const data = dataArray.join('');
-            return new Response(data, { status: 200 });
+            return new Response(dataArray, { status: 200 });
 		} else {
 			return new Response(html, {
 				headers: {
