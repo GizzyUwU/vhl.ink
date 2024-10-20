@@ -87,10 +87,19 @@ async function handleRequest(request, event) {
 		if (psk === SECRET_KEY) {
 			// const { keys } = await LINKS.list();
 			let paths = "";
-			Object.keys(LINKS).forEach(key => {
-				const value = LINKS[key];
-				paths += `${key} ${value} \n`;
-			});
+            if (LINKS && typeof LINKS === 'object') {
+                Object.entries(LINKS).forEach(([key, value]) => {
+                    paths += `${key} ${value} \n`;
+                });
+
+                // Check if paths is still empty
+                if (paths === "") {
+                    paths = "No links available.";
+                }
+            } else {
+                paths = "LINKS is not an object.";
+            }
+
 			
 			return new Response(paths, { status: 200 });
 		}
