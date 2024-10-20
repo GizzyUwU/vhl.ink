@@ -85,14 +85,12 @@ async function handleRequest(request, event) {
 		const psk = request.headers.get('x-preshared-key');
 		if (psk === SECRET_KEY) {
 			const { keys } = await LINKS.list();
-            const dataPromises = keys.map(async (element) => {
-                const value = await LINKS.get(element.name);
-                return `${element.name} ${value}`;
-            });
-
-            const dataArray = await Promise.all(dataPromises);
-            const data = dataArray.join('');
-            return new Response(dataArray, { status: 200 });
+			const dataPromises = keys.map(async (element) => {
+				const value = await LINKS.get(element.name);
+				return { name: element.name, value };
+			})
+			const dataArray = await Promise.all(dataPromises);
+            return new Response(JSON.stringify(dataArray), { status: 200 });
 		} else {
 			return new Response(html, {
 				headers: {
