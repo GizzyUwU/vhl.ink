@@ -82,16 +82,17 @@ async function handleRequest(request, event) {
 	const url = new URL(request.url);
 	const path = url.pathname.split('/')[1];
 	if (!path) {
-		// Return list of available shortlinks if user supplies admin credentials.
 		const psk = request.headers.get('x-preshared-key');
 		if (psk === SECRET_KEY) {
 			const { keys } = await LINKS.list();
-			keys.forEach(async (element) => {
-				let paths = "";
-				const value = await LINKS.get(element.name)
-				paths += `${element.name} ${value}\n`
-				return new Response(paths, { status: 200 });
-			});
+            const dataPromises = keys.map(async (element) => {
+                const value = await LINKS.get(element.name);
+                return `${element.name} ${value}\n`;
+            });
+
+            const dataArray = await Promise.all(dataPromises);
+            const data = dataArray.join('');
+            return new Response(data, { status: 200 });
 		} else {
 			return new Response(html, {
 				headers: {
