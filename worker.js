@@ -87,7 +87,11 @@ async function handleRequest(request, event) {
 		if (psk === SECRET_KEY) {
 			const { keys } = await LINKS.list();
 			let paths = "";
-			keys.forEach(element => paths += `${element.name} ${element.value}\n`);
+			keys.forEach(async element => {
+				const value = await env.NAMESPACE.get(element.name);
+				
+				paths += `${element.name} ${value}\n`
+			});
 			
 			return new Response(paths, { status: 200 });
 		}
