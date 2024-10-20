@@ -85,12 +85,11 @@ async function handleRequest(request, event) {
 		// Return list of available shortlinks if user supplies admin credentials.
 		const psk = request.headers.get('x-preshared-key');
 		if (psk === SECRET_KEY) {
-			const { keys } = await LINKS.list();
+			// const { keys } = await LINKS.list();
 			let paths = "";
-			for (const element of keys) {
-				const value = await env.NAMESPACE.get(element.name);
-				paths += `${element.name} ${value}\n`;
-			}
+			LINKS.forEach((value, key) => {
+				paths += `${key} ${value} \n`;
+			});
 			
 			return new Response(paths, { status: 200 });
 		}
