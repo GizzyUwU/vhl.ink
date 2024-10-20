@@ -62,14 +62,24 @@ async function handlePOST(request) {
 			const existing = await LINKS.get(path);
 			if (!existing) {
 				unique = true;
+				await LINKS.put(path, redirectURL);
+				return new Response(`${redirectURL} available at ${shortener}${path}`, {
+					status: 201,
+				});
 			}
 		}
+	} else if(path) {
+		const existing = await LINKS.get(path);
+		if (existing) {
+			return new Response(`${path} is already being used.`, {
+				status: 409,
+			});
+		} else {
+			return new Response(`${redirectURL} available at ${shortener}${path}`, {
+				status: 201,
+			});
+		}
 	}
-
-	await LINKS.put(path, redirectURL);
-	return new Response(`${redirectURL} available at ${shortener}${path}`, {
-		status: 201,
-	});
 }
 
 /**
