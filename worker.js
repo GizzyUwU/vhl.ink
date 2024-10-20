@@ -34,12 +34,10 @@ async function handlePOST(request) {
 	const shortener = new URL(request.url);
 	const data = await request.formData();
 	const redirectURL = data.get('url');
-	const path = data.get('path');
+	let path = data.get('path');
 
-	if (!redirectURL || !path)
-		return new Response('`url` and `path` need to be set.', { status: 400 });
+	if (!redirectURL) return new Response('`url` needs to be set.', { status: 400 });
 
-	// validate redirectURL is a URL
 	try {
 		new URL(redirectURL);
 	} catch (e) {
@@ -48,7 +46,26 @@ async function handlePOST(request) {
 		else throw e;
 	};
 
-	// will overwrite current path if it exists
+	const generateRandomId = () => {
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		let result = '';
+		for (let i = 0; i < 16; i++) {
+			result += characters.charAt(Math.floor(Math.random() * characters.length));
+		}
+		return result;
+	};
+
+	if (!path) {
+		let unique = false;
+		while (!unique) {
+			path = generateRandomId();
+			const existing = await LINKS.get(path);
+			if (!existing) {
+				unique = true;
+			}
+		}
+	}
+
 	await LINKS.put(path, redirectURL);
 	return new Response(`${redirectURL} available at ${shortener}${path}`, {
 		status: 201,
